@@ -351,7 +351,8 @@ function ContactsSection() {
   );
 }
 
-function ProfileSection() {
+function ProfileSection({ user, onLogout }: { user: IndexProps['user']; onLogout: () => void }) {
+  const initials = user.display_name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
   return (
     <div className="flex-1 flex flex-col h-full animate-fade-in overflow-y-auto">
       <div className="px-4 pt-5 pb-3 border-b border-dark-border">
@@ -360,16 +361,15 @@ function ProfileSection() {
       <div className="px-4 py-6 flex flex-col items-center gap-4 border-b border-dark-border">
         <div className="relative">
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-neon-green/20 to-neon-purple/20 border-2 border-neon-green/40 flex items-center justify-center text-2xl font-display font-bold text-neon-green animate-pulse-glow">
-            ВИ
+            {initials}
           </div>
           <button className="absolute -bottom-1 -right-1 w-6 h-6 rounded-lg bg-neon-green flex items-center justify-center">
             <Icon name="Camera" size={12} className="text-dark-bg" />
           </button>
         </div>
         <div className="text-center">
-          <p className="text-lg font-semibold text-white">Виктор Иванов</p>
-          <p className="text-xs font-mono text-neon-green/70">@viktor_ivanov</p>
-          <p className="text-sm text-gray-500 mt-1">Разработчик. Защищаю приватность.</p>
+          <p className="text-lg font-semibold text-white">{user.display_name}</p>
+          <p className="text-xs font-mono text-neon-green/70">@{user.username}</p>
         </div>
         <div className="flex items-center gap-2 bg-neon-green/5 border border-neon-green/20 rounded-xl px-4 py-2">
           <Icon name="ShieldCheck" size={14} className="text-neon-green" />
@@ -395,6 +395,15 @@ function ProfileSection() {
             </button>
           </div>
         ))}
+      </div>
+      <div className="px-4 pb-4">
+        <button
+          onClick={onLogout}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-destructive/30 bg-destructive/5 hover:bg-destructive/10 transition-colors text-sm text-destructive"
+        >
+          <Icon name="LogOut" size={14} />
+          Выйти из аккаунта
+        </button>
       </div>
     </div>
   );
@@ -575,24 +584,31 @@ function SettingsSection() {
           </div>
         ))}
         <div className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden">
-          {([
-            { icon: 'HelpCircle', label: 'Помощь', color: 'text-gray-500' },
-            { icon: 'LogOut', label: 'Выйти из аккаунта', color: 'text-destructive' },
-          ] as { icon: string; label: string; color: string }[]).map((item) => (
-            <button key={item.label} className="w-full flex items-center gap-3 px-4 py-3 border-b border-dark-border/30 last:border-b-0 hover:bg-dark-panel transition-colors">
-              <Icon name={item.icon} size={16} className={item.color} />
-              <span className={`text-sm ${item.color}`}>{item.label}</span>
-            </button>
-          ))}
+          <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-dark-panel transition-colors">
+            <Icon name="HelpCircle" size={16} className="text-gray-500" />
+            <span className="text-sm text-gray-500">Помощь</span>
+          </button>
         </div>
       </div>
     </div>
   );
 }
 
-export default function Index() {
+interface IndexProps {
+  user: { id: number; username: string; display_name: string };
+  onLogout: () => void;
+}
+
+export default function Index({ user, onLogout }: IndexProps) {
   const [section, setSection] = useState<Section>('chats');
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
+
+  const initials = user.display_name
+    .split(' ')
+    .map(w => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
 
   const showChatWindow = section === 'chats' || section === 'archive' || section === 'secret';
 
@@ -626,12 +642,20 @@ export default function Index() {
           </button>
         ))}
 
-        <div className="mt-auto">
+        <div className="mt-auto flex flex-col items-center gap-1">
           <button
             onClick={() => setSection('profile')}
+            title={user.display_name}
             className="w-9 h-9 rounded-xl bg-gradient-to-br from-neon-green/20 to-neon-blue/20 border border-neon-green/30 flex items-center justify-center text-xs font-display font-bold text-neon-green hover:border-neon-green transition-colors"
           >
-            ВИ
+            {initials}
+          </button>
+          <button
+            onClick={onLogout}
+            title="Выйти"
+            className="w-9 h-9 rounded-xl hover:bg-dark-card flex items-center justify-center transition-colors"
+          >
+            <Icon name="LogOut" size={14} className="text-gray-600 hover:text-destructive transition-colors" />
           </button>
         </div>
       </nav>
@@ -659,7 +683,7 @@ export default function Index() {
         )}
         {section === 'search' && <SearchSection />}
         {section === 'contacts' && <ContactsSection />}
-        {section === 'profile' && <ProfileSection />}
+        {section === 'profile' && <ProfileSection user={user} onLogout={onLogout} />}
         {section === 'archive' && <ArchiveSection />}
         {section === 'secret' && <SecretSection />}
         {section === 'settings' && <SettingsSection />}
