@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import Icon from '@/components/ui/icon';
 
-const REGISTER_URL = 'https://functions.poehali.dev/91af4748-a330-42c1-a04c-d876ab790d22';
-const LOGIN_URL = 'https://functions.poehali.dev/e44b310c-1d58-4647-9e17-5cddb504335b';
+const AUTH_URL = 'https://functions.poehali.dev/a34ad981-816c-49f6-8611-4a4f2b9cfb67';
 
 interface User {
   id: number;
@@ -27,11 +26,10 @@ export default function AuthScreen({ onAuth }: AuthScreenProps) {
     setError('');
     setLoading(true);
 
-    const url = mode === 'login' ? LOGIN_URL : REGISTER_URL;
-    const body: Record<string, string> = { username, password };
+    const body: Record<string, string> = { username, password, action: mode };
     if (mode === 'register') body.display_name = displayName || username;
 
-    const res = await fetch(url, {
+    const res = await fetch(`${AUTH_URL}?action=${mode}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),

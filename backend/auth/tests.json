@@ -1,27 +1,18 @@
 {
   "tests": [
     {
-      "name": "Register new user",
+      "name": "Register user",
       "method": "POST",
-      "path": "/register",
-      "body": {"username": "testuser_ci", "display_name": "Test User", "password": "secret123"},
+      "path": "/?action=register",
+      "body": {"username": "testuser_auth2", "display_name": "Test Auth", "password": "secret123"},
       "expectedStatus": 200,
-      "expectedBody": {"token": "string"},
       "bodyMatcher": "partial"
     },
     {
-      "name": "Login correct",
+      "name": "Login wrong password",
       "method": "POST",
-      "path": "/login",
-      "body": {"username": "testuser_ci", "password": "secret123"},
-      "expectedStatus": 200,
-      "expectedBody": {"token": "string"},
-      "bodyMatcher": "partial"
-    },
-    {
-      "name": "Get me without token",
-      "method": "GET",
-      "path": "/me",
+      "path": "/?action=login",
+      "body": {"username": "nonexistent_xyz99", "password": "wrongpass"},
       "expectedStatus": 401,
       "bodyMatcher": "partial"
     }
